@@ -1,0 +1,506 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #d0d0d0;
+    transition: background-color 0.15s ease-in-out;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 背景颜色变化效果 */
+body.flash-green {
+    background-color: #4CAF50;
+}
+
+body.flash-blue {
+    background-color: #2196F3;
+}
+
+body.flash-orange {
+    background-color: #FF9800;
+}
+
+body.flash-purple {
+    background-color: #9C27B0;
+}
+
+body.flash-red {
+    background-color: #F44336;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    flex: 1;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.video-input-section {
+    margin-bottom: 30px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#youtube-url {
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    width: 400px;
+    max-width: 100%;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#youtube-url:focus {
+    border-color: #4CAF50;
+}
+
+#load-video {
+    padding: 12px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#load-video:hover {
+    background-color: #45a049;
+}
+
+/* 视频和分数的水平布局 */
+.video-score-layout {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+    max-width: 98vw;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 10px;
+}
+
+.video-score-layout .score-item:first-child {
+    margin-right: auto;
+}
+
+.video-score-layout .score-item:last-child {
+    margin-left: auto;
+}
+
+.video-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+#youtube-player {
+    width: 100%;
+    max-width: 1400px;
+    min-width: 800px;
+    height: 788px;
+    border: 3px solid #333;
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: #000;
+    position: relative;
+}
+
+/* 评分数字显示覆盖层 */
+.score-overlay {
+    position: absolute;
+    top: 100px;
+    left: 150px;
+    z-index: 10000;
+    pointer-events: none;
+    width: 180px;
+    height: 180px;
+}
+
+.score-number {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+    display: inline-block;
+}
+
+/* 显示状态 */
+.score-number.show {
+    opacity: 1;
+}
+
+/* 不同分数的颜色和大小 */
+.score-number.score-1 {
+    color: #4CAF50;
+    font-size: 3em;
+}
+
+.score-number.score-minus-1 {
+    color: #F44336;
+    font-size: 3em;
+}
+
+.score-number.score-2 {
+    color: #2196F3;
+    font-size: 3.3em;
+}
+
+.score-number.score-3 {
+    color: #FF9800;
+    font-size: 3.6em;
+}
+
+.score-number.score-4 {
+    color: #9C27B0;
+    font-size: 3.9em;
+}
+
+.score-number.score-5 {
+    color: #9C27B0;
+    font-size: 4.2em;
+}
+
+/* 消失动画 */
+.score-number.hide {
+    opacity: 0;
+    transition: opacity 0.4s ease-in;
+}
+
+#youtube-player iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-size: 18px;
+}
+
+.score-item {
+    background-color: white;
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 120px;
+    height: 200px;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.score-item:hover {
+    transform: translateY(-5px);
+}
+
+.score-prefix {
+    font-size: 4em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.add-score .score-prefix {
+    color: #4CAF50;
+}
+
+.subtract-score .score-prefix {
+    color: #F44336;
+}
+
+.score-display {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.controls-info {
+    margin-bottom: 30px;
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.controls-info h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.key-info {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.key-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.key-item:hover {
+    background-color: #e9ecef;
+}
+
+.key {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.desc {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.reset-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#reset-scores {
+    padding: 15px 30px;
+    background-color: #FF5722;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#reset-scores:hover {
+    background-color: #E64A19;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) and (min-width: 769px) {
+    .video-score-layout {
+        max-width: 95vw;
+        padding: 0 10px;
+    }
+    
+    .score-item {
+        width: 100px;
+        height: 180px;
+        padding: 25px 15px;
+        gap: 15px;
+    }
+    
+    .score-prefix {
+        font-size: 3.5em;
+    }
+    
+    .score-display {
+        font-size: 2.2em;
+    }
+    
+    #youtube-player {
+        max-width: 1100px;
+        height: 619px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 8px;
+    }
+    
+    header h1 {
+        font-size: 2em;
+    }
+    
+    #youtube-url {
+        width: 300px;
+    }
+    
+    .video-score-layout {
+        flex-direction: column;
+        gap: 20px;
+        max-width: 98vw;
+        padding: 0 5px;
+    }
+    
+    #youtube-player {
+        height: 480px;
+        max-width: 640px;
+    }
+    
+    .score-item {
+        width: 200px;
+        height: 100px;
+        padding: 15px 10px;
+        gap: 10px;
+    }
+    
+    .score-prefix {
+        font-size: 3em;
+    }
+    
+    .score-display {
+        font-size: 2em;
+    }
+    
+    /* 响应式评分数字显示 */
+    .score-overlay {
+        top: 80px;
+        left: 120px;
+        width: 150px;
+        height: 150px;
+    }
+    
+    .score-number.score-1,
+    .score-number.score-minus-1 {
+        font-size: 2.4em;
+    }
+    
+    .score-number.score-2 {
+        font-size: 2.6em;
+    }
+    
+    .score-number.score-3 {
+        font-size: 2.8em;
+    }
+    
+    .score-number.score-4 {
+        font-size: 3.0em;
+    }
+    
+    .score-number.score-5 {
+        font-size: 3.2em;
+    }
+    
+    .key-info {
+        gap: 15px;
+    }
+    
+    .key-item {
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #youtube-url {
+        width: 250px;
+    }
+    
+    .video-score-layout {
+        gap: 15px;
+        max-width: 98vw;
+        padding: 0 5px;
+    }
+    
+    #youtube-player {
+        height: 360px;
+        max-width: 480px;
+    }
+    
+    .score-item {
+        width: 150px;
+        height: 80px;
+        padding: 10px 8px;
+        gap: 5px;
+    }
+    
+    .score-prefix {
+        font-size: 2.5em;
+    }
+    
+    .score-display {
+        font-size: 1.6em;
+    }
+    
+    .key-info {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* 手机端评分数字显示 */
+    .score-overlay {
+        top: 50px;
+        left: 80px;
+        width: 120px;
+        height: 120px;
+    }
+    
+    .score-number.score-1,
+    .score-number.score-minus-1 {
+        font-size: 1.8em;
+    }
+    
+    .score-number.score-2 {
+        font-size: 2.0em;
+    }
+    
+    .score-number.score-3 {
+        font-size: 2.2em;
+    }
+    
+    .score-number.score-4 {
+        font-size: 2.4em;
+    }
+    
+    .score-number.score-5 {
+        font-size: 2.6em;
+    }
+} 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>悠悠球比赛评分系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="video-input-section">
+            <div class="input-group">
+                <input type="text" id="youtube-url" placeholder="请输入YouTube视频链接..." />
+                <button id="load-video">加载视频</button>
+            </div>
+        </div>
+
+        <div class="video-score-layout">
+            <!-- 左侧总加分 -->
+            <div class="score-item add-score">
+                <span class="score-prefix">+</span>
+                <div class="score-display" id="add-score">0</div>
+            </div>
+            
+            <!-- 中间视频容器 -->
+            <div class="video-container">
+                <div id="youtube-player">
+                    <div class="placeholder">
+                        <p>请输入YouTube链接加载视频</p>
+                    </div>
+                </div>
+                <!-- 评分数字显示层 - 移到视频容器外层，避免被iframe遮挡 -->
+                <div class="score-overlay">
+                    <div id="score-display" class="score-number"></div>
+                </div>
+            </div>
+            
+            <!-- 右侧总减分 -->
+            <div class="score-item subtract-score">
+                <span class="score-prefix">-</span>
+                <div class="score-display" id="subtract-score">0</div>
+            </div>
+        </div>
+
+        <div class="reset-section">
+            <button id="reset-scores">重置分数</button>
+        </div>
+
+        <div class="controls-info">
+            <h3>键盘操作说明</h3>
+            <div class="key-info">
+                <div class="key-item">
+                    <span class="key">1</span>
+                    <span class="desc">+1分 (绿色)</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">2</span>
+                    <span class="desc">+2分 (蓝色)</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">3</span>
+                    <span class="desc">+3分 (橙色)</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">4</span>
+                    <span class="desc">+4分 (紫色)</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">5</span>
+                    <span class="desc">+5分 (紫色)</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">0</span>
+                    <span class="desc">-1分 (红色)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
