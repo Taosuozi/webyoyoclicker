@@ -23,21 +23,43 @@
 
 ## 🚀 快速开始
 
-### 1. 启动服务器
+⚠️ **重要说明**：由于YouTube安全策略限制，**不能直接双击HTML文件打开**，必须通过HTTP服务器运行！
+
+### 🌐 方法一：使用Python（推荐）
 ```bash
+# 在项目目录下运行
 python -m http.server 8080
+
+# 或者使用Python 2
+python -m SimpleHTTPServer 8080
+```
+然后打开浏览器访问：`http://localhost:8080`
+
+### 💻 方法二：使用VSCode Live Server
+1. 安装 Visual Studio Code
+2. 安装 "Live Server" 扩展
+3. 右键点击 `index.html` → "Open with Live Server"
+4. 自动在浏览器打开 `http://127.0.0.1:5500`
+
+### 🔧 方法三：使用Node.js
+```bash
+# 全局安装
+npm install -g live-server
+
+# 在项目目录运行
+live-server
 ```
 
-### 2. 打开浏览器
-访问：`http://localhost:8080`
+### 📱 方法四：使用其他工具
+- **PHP**：`php -S localhost:8080`
+- **Ruby**：`ruby -run -e httpd . -p 8080`
+- **任何HTTP服务器软件**
 
-### 3. 加载视频
-- 在输入框中粘贴YouTube视频链接
-- 点击"加载视频"按钮
-- 视频成功加载后，输入框会自动隐藏
-
-### 4. 开始评分
-使用数字键0-5进行实时评分操作
+### 🎯 开始使用
+1. 启动HTTP服务器（推荐方法二VSCode Live Server）
+2. 在输入框中粘贴YouTube视频链接
+3. 点击"加载视频"按钮，视频成功加载后输入框会自动隐藏
+4. 使用数字键0-5进行实时评分操作
 
 ---
 
