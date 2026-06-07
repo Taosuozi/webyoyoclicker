@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>悠悠球比赛评分系统</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260607-2">
 </head>
 <body>
     <div class="container">
@@ -16,29 +16,32 @@
         </div>
 
         <div class="video-score-layout">
-            <!-- 左侧总加分 -->
-            <div class="score-item add-score">
-                <span class="score-prefix">+</span>
-                <div class="score-display" id="add-score">0</div>
-            </div>
-            
             <!-- 中间视频容器 -->
             <div class="video-container">
-                <div id="youtube-player">
-                    <div class="placeholder">
-                        <p>请输入YouTube链接加载视频</p>
+                <div class="video-stage">
+                    <div id="youtube-player">
+                        <div class="placeholder">
+                            <p>请输入YouTube链接加载视频</p>
+                        </div>
+                    </div>
+
+                    <!-- 左侧总加分 -->
+                    <div class="score-item add-score" data-score-panel="add">
+                        <span class="score-prefix">+</span>
+                        <div class="score-display" id="add-score">0</div>
+                    </div>
+                    
+                    <!-- 右侧总减分 -->
+                    <div class="score-item subtract-score" data-score-panel="subtract">
+                        <span class="score-prefix">-</span>
+                        <div class="score-display" id="subtract-score">0</div>
+                    </div>
+
+                    <!-- 评分数字显示层 - 移到视频容器外层，避免被iframe遮挡 -->
+                    <div class="score-overlay">
+                        <div id="score-display" class="score-number"></div>
                     </div>
                 </div>
-                <!-- 评分数字显示层 - 移到视频容器外层，避免被iframe遮挡 -->
-                <div class="score-overlay">
-                    <div id="score-display" class="score-number"></div>
-                </div>
-            </div>
-            
-            <!-- 右侧总减分 -->
-            <div class="score-item subtract-score">
-                <span class="score-prefix">-</span>
-                <div class="score-display" id="subtract-score">0</div>
             </div>
         </div>
 
@@ -77,6 +80,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260607-2"></script>
 </body>
 </html> 

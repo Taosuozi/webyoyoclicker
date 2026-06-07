@@ -1,6 +1,7 @@
 // 分数追踪
 let addScore = 0;
 let subtractScore = 0;
+let isVideoLoaded = false;
 
 // DOM元素
 const youtubeUrlInput = document.getElementById('youtube-url');
@@ -10,71 +11,17 @@ const addScoreDisplay = document.getElementById('add-score');
 const subtractScoreDisplay = document.getElementById('subtract-score');
 const resetScoresBtn = document.getElementById('reset-scores');
 const scoreDisplayOverlay = document.getElementById('score-display');
-// 不再需要键盘覆盖层，使用全局事件拦截
-
-// 🔬 即时诊断：页面加载状态
-console.log('📊 脚本开始执行');
-console.log('📊 页面加载状态:', document.readyState);
-console.log('📊 DOM元素检查:', {
-    body: !!document.body,
-    youtubeInput: !!document.getElementById('youtube-url'),
-    addScore: !!document.getElementById('add-score')
-});
-
-// 🚀 立即设置键盘监听（不等待DOM加载完成）
-function setupImmediateKeyboardListening() {
-    console.log('🚀 立即设置键盘监听...');
-    
-    // 如果document已存在，立即设置
-    if (document) {
-        document.addEventListener('keydown', handleGlobalKeyDown, true);
-        document.addEventListener('keyup', handleGlobalKeyUp, true);
-        console.log('✅ document 键盘监听已立即设置');
-    }
-    
-    // window总是存在的
-    window.addEventListener('keydown', handleGlobalKeyDown, true);
-    window.addEventListener('keyup', handleGlobalKeyUp, true);
-    console.log('✅ window 键盘监听已立即设置');
-}
-
-// 立即执行
-setupImmediateKeyboardListening();
+const videoStage = document.querySelector('.video-stage');
+const addScorePanel = document.querySelector('.add-score');
+const subtractScorePanel = document.querySelector('.subtract-score');
+const scoringKeys = ['0', '1', '2', '3', '4', '5', 'r', 'R'];
+let scorePanelPosition = { x: 24, y: 24 };
+let activeScorePanelDrag = null;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎯 DOMContentLoaded 事件触发');
     setupEventListeners();
     updateScoreDisplays();
-    
-        // 🧪 3秒后提示用户开始调试测试
-    setTimeout(() => {
-        console.log(`
-🔬 调试模式启动！请按以下步骤测试：
-
-📋 第一步：基础调试
-1. 现在按任意键（比如字母a），查看控制台是否出现：
-   "🔍 捕获到按键: a, 来源: BODY, 事件阶段: 1"
-   
-2. 如果看到这个消息，说明事件监听器工作正常
-   如果没有看到，说明事件监听器设置失败
-
-📋 第二步：数字键测试  
-1. 按数字键1，查看控制台是否出现：
-   "🎯 数字键 1 被强力拦截！正在执行评分..."
-   "✅ +1分 绿色背景"
-   
-2. 同时观察页面：背景是否变绿？分数是否+1？
-
-📋 第三步：YouTube功能测试
-1. 确保YouTube视频正在播放
-2. 按方向键←→，看视频是否快进/后退
-3. 按空格键，看视频是否暂停/播放
-
-📋 报告结果：
-请告诉我你看到了什么调试信息，这样我就能准确定位问题！
-        `);
-    }, 3000);
 });
 
 // 设置事件监听器
@@ -89,160 +36,179 @@ function setupEventListeners() {
         }
     });
     
-    // 输入框焦点处理已不再需要特殊处理
-    
     // 重置分数按钮
     resetScoresBtn.addEventListener('click', resetScores);
-    
-    // 🎯 超级强化键盘事件拦截 - 多重保障
-    
-    // 第一层：document capture阶段
+
+    // 全局评分快捷键。只保留一组监听，避免一次按键被多处处理。
     document.addEventListener('keydown', handleGlobalKeyDown, true);
-    document.addEventListener('keyup', handleGlobalKeyUp, true);
-    console.log('📡 第一层：document capture 监听已设置');
-    
-    // 第二层：window capture阶段  
-    window.addEventListener('keydown', handleGlobalKeyDown, true);
-    window.addEventListener('keyup', handleGlobalKeyUp, true);
-    console.log('📡 第二层：window capture 监听已设置');
-    
-    // 第三层：document bubble阶段
-    document.addEventListener('keydown', handleGlobalKeyDown, false);
-    document.addEventListener('keyup', handleGlobalKeyUp, false);
-    console.log('📡 第三层：document bubble 监听已设置');
-    
-    // 第四层：body元素直接监听
-    document.body.addEventListener('keydown', handleGlobalKeyDown, true);
-    document.body.addEventListener('keyup', handleGlobalKeyUp, true);
-    console.log('📡 第四层：body capture 监听已设置');
-    
-    // 第五层：html元素监听
-    document.documentElement.addEventListener('keydown', handleGlobalKeyDown, true);
-    document.documentElement.addEventListener('keyup', handleGlobalKeyUp, true);
-    console.log('📡 第五层：html capture 监听已设置');
-    
-    console.log('🔧 已启用超级强化多重键盘拦截机制！');
-    
-    // 🧪 立即自测：检查函数是否正常工作
-    console.log('🧪 正在自测系统...');
-    
-    // 测试分数系统
-    addPoints(1);
-    console.log(`✅ 分数系统测试通过，当前加分: ${addScore}`);
-    addScore = 0; // 重置
-    updateScoreDisplays();
-    
-    // 测试背景闪烁（考虑最短时间）
-    flashBackground('green');
-    setTimeout(() => {
-        console.log('✅ 背景闪烁系统测试通过（已设置最短闪烁时间300ms）');
-    }, 400);
-    
-    // 测试视频覆盖显示
-    setTimeout(() => {
-        if (scoreDisplayOverlay) {
-            showScoreOnVideo(1);
-            console.log('✅ 视频评分显示系统测试通过（无边框纯文字显示300ms）');
-        } else {
-            console.log('⚠️ 视频评分显示元素未找到，请检查');
-        }
-    }, 1000);
-    
-    console.log('🎯 系统自测完成，所有基础功能正常！');
+    setupScorePanelDragging();
+    window.addEventListener('resize', applyMirroredScorePanelPositions);
 }
 
-// 🎯 全局键盘按下事件处理 - 增强调试版本
+function isEditableTarget(target) {
+    if (!target) return false;
+
+    const tagName = target.tagName;
+    return target.isContentEditable ||
+        tagName === 'INPUT' ||
+        tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' ||
+        tagName === 'BUTTON';
+}
+
+// 全局键盘按下事件处理
 function handleGlobalKeyDown(e) {
-    // 首先记录所有按键事件
-    console.log(`🔍 捕获到按键: ${e.key}, 来源: ${e.target.tagName}, 事件阶段: ${e.eventPhase}`);
-    
     // 防止重复触发
     if (e.repeat) return;
     
     const key = e.key;
     
-    // 🔍 拦截评分用的数字键和重置键：0, 1, 2, 3, 4, 5, r
-    if (['0', '1', '2', '3', '4', '5', 'r', 'R'].includes(key)) {
-        // ⛔ 强力拦截 - 使用所有可能的方法
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        
-        console.log(`🎯 按键 ${key} 被强力拦截！正在执行操作...`);
-        
-        // 执行评分/重置逻辑
-        switch(key) {
-            case '1':
-                addPoints(1);
-                flashBackground('green');
-                showScoreOnVideo(1);
-                console.log('✅ +1分 绿色背景300ms + 视频显示300ms');
-                break;
-            case '2':
-                addPoints(2);
-                flashBackground('blue');
-                showScoreOnVideo(2);
-                console.log('✅ +2分 蓝色背景300ms + 视频显示300ms');
-                break;
-            case '3':
-                addPoints(3);
-                flashBackground('orange');
-                showScoreOnVideo(3);
-                console.log('✅ +3分 橙色背景300ms + 视频显示300ms');
-                break;
-            case '4':
-                addPoints(4);
-                flashBackground('purple');
-                showScoreOnVideo(4);
-                console.log('✅ +4分 紫色背景300ms + 视频显示300ms');
-                break;
-            case '5':
-                addPoints(5);
-                flashBackground('purple');
-                showScoreOnVideo(5);
-                console.log('✅ +5分 紫色背景300ms + 视频显示300ms');
-                break;
-            case '0':
-                subtractPoints(1);
-                flashBackground('red');
-                showScoreOnVideo(-1);
-                console.log('✅ -1分 红色背景300ms + 视频显示300ms');
-                break;
-            case 'r':
-            case 'R':
-                resetScoresOnly();
-                console.log('🔄 R键重置分数（保持视频加载状态）');
-                break;
-        }
-        
-        return false; // 确保事件完全被拦截
-    } else {
-        // 记录非数字键但不拦截
-        console.log(`🎬 非评分键 ${key} 传递给YouTube`);
+    if (!scoringKeys.includes(key) || !isVideoLoaded || isEditableTarget(e.target)) {
+        return;
     }
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    switch(key) {
+        case '1':
+            addPoints(1);
+            flashBackground('green');
+            showScoreOnVideo(1);
+            break;
+        case '2':
+            addPoints(2);
+            flashBackground('blue');
+            showScoreOnVideo(2);
+            break;
+        case '3':
+            addPoints(3);
+            flashBackground('orange');
+            showScoreOnVideo(3);
+            break;
+        case '4':
+            addPoints(4);
+            flashBackground('purple');
+            showScoreOnVideo(4);
+            break;
+        case '5':
+            addPoints(5);
+            flashBackground('purple');
+            showScoreOnVideo(5);
+            break;
+        case '0':
+            subtractPoints(1);
+            flashBackground('red');
+            showScoreOnVideo(-1);
+            break;
+        case 'r':
+        case 'R':
+            resetScoresOnly();
+            break;
+    }
+        
+    return false;
 }
 
-// 🎯 全局键盘松开事件处理 - 增强调试版本
-function handleGlobalKeyUp(e) {
-    // 记录所有松开事件（简化版）
-    console.log(`🔍 松开按键: ${e.key}`);
-    
-    const key = e.key;
-    
-    // 🔍 拦截评分用的数字键和重置键：0, 1, 2, 3, 4, 5, r
-    if (['0', '1', '2', '3', '4', '5', 'r', 'R'].includes(key)) {
-        // ⛔ 强力拦截
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        
-        console.log(`🎯 数字键 ${key} 松开被拦截，尊重最短闪烁时间`);
-        removeBackgroundFlash();
-        
-        return false; // 确保事件完全被拦截
-    } else {
-        console.log(`🎬 非评分键 ${key} 松开事件传递给YouTube`);
+function setupScorePanelDragging() {
+    [addScorePanel, subtractScorePanel].forEach(panel => {
+        panel.addEventListener('pointerdown', startScorePanelDrag);
+        panel.addEventListener('pointermove', moveScorePanelDrag);
+        panel.addEventListener('pointerup', endScorePanelDrag);
+        panel.addEventListener('pointercancel', endScorePanelDrag);
+    });
+
+    applyMirroredScorePanelPositions();
+}
+
+function startScorePanelDrag(e) {
+    if (!videoStage) return;
+
+    const panel = e.currentTarget;
+    const stageRect = videoStage.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+
+    activeScorePanelDrag = {
+        panel,
+        side: panel.dataset.scorePanel,
+        offsetX: e.clientX - panelRect.left,
+        offsetY: e.clientY - panelRect.top
+    };
+
+    panel.classList.add('is-dragging');
+    panel.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    updateScorePanelPosition(e.clientX - stageRect.left, e.clientY - stageRect.top);
+}
+
+function moveScorePanelDrag(e) {
+    if (!activeScorePanelDrag) return;
+
+    const stageRect = videoStage.getBoundingClientRect();
+    updateScorePanelPosition(e.clientX - stageRect.left, e.clientY - stageRect.top);
+}
+
+function endScorePanelDrag(e) {
+    if (!activeScorePanelDrag) return;
+
+    activeScorePanelDrag.panel.classList.remove('is-dragging');
+    if (activeScorePanelDrag.panel.hasPointerCapture(e.pointerId)) {
+        activeScorePanelDrag.panel.releasePointerCapture(e.pointerId);
     }
+    activeScorePanelDrag = null;
+}
+
+function updateScorePanelPosition(pointerX, pointerY) {
+    const addWidth = addScorePanel.offsetWidth;
+    const addHeight = addScorePanel.offsetHeight;
+    const subtractWidth = subtractScorePanel.offsetWidth;
+    const stageWidth = videoStage.clientWidth;
+    const stageHeight = videoStage.clientHeight;
+    const draggedX = pointerX - activeScorePanelDrag.offsetX;
+    const draggedY = pointerY - activeScorePanelDrag.offsetY;
+    const panelHeight = activeScorePanelDrag.panel.offsetHeight;
+
+    scorePanelPosition.y = clamp(draggedY, 0, stageHeight - panelHeight);
+
+    if (activeScorePanelDrag.side === 'subtract') {
+        const subtractX = clamp(draggedX, 0, stageWidth - subtractWidth);
+        const subtractCenterX = subtractX + subtractWidth / 2;
+        scorePanelPosition.x = stageWidth - subtractCenterX - addWidth / 2;
+    } else {
+        scorePanelPosition.x = clamp(draggedX, 0, stageWidth - addWidth);
+    }
+
+    applyMirroredScorePanelPositions();
+}
+
+function applyMirroredScorePanelPositions() {
+    if (!videoStage || !addScorePanel || !subtractScorePanel) return;
+
+    const stageWidth = videoStage.clientWidth;
+    const stageHeight = videoStage.clientHeight;
+    const addWidth = addScorePanel.offsetWidth;
+    const addHeight = addScorePanel.offsetHeight;
+    const subtractWidth = subtractScorePanel.offsetWidth;
+    const subtractHeight = subtractScorePanel.offsetHeight;
+
+    scorePanelPosition.x = clamp(scorePanelPosition.x, 0, stageWidth - addWidth);
+    scorePanelPosition.y = clamp(scorePanelPosition.y, 0, stageHeight - Math.max(addHeight, subtractHeight));
+
+    const addCenterX = scorePanelPosition.x + addWidth / 2;
+    const subtractX = clamp(stageWidth - addCenterX - subtractWidth / 2, 0, stageWidth - subtractWidth);
+
+    addScorePanel.style.left = `${scorePanelPosition.x}px`;
+    addScorePanel.style.top = `${scorePanelPosition.y}px`;
+    addScorePanel.style.right = 'auto';
+    subtractScorePanel.style.left = `${subtractX}px`;
+    subtractScorePanel.style.top = `${scorePanelPosition.y}px`;
+    subtractScorePanel.style.right = 'auto';
+}
+
+function clamp(value, min, max) {
+    if (max < min) return min;
+    return Math.min(Math.max(value, min), max);
 }
 
 
@@ -302,6 +268,7 @@ function resetScores() {
     if (confirm('确定要重置所有分数吗？')) {
         addScore = 0;
         subtractScore = 0;
+        isVideoLoaded = false;
         updateScoreDisplays();
         
         // 🎯 重置完成，全局键盘拦截持续有效
@@ -348,6 +315,7 @@ function flashBackground(color) {
     // 确保最短闪烁时间：300毫秒
     backgroundFlashTimeout = setTimeout(() => {
         removeBackgroundFlashImmediate();
+        backgroundFlashTimeout = null;
     }, 300);
 }
 
@@ -395,6 +363,7 @@ function loadVideo() {
             allowfullscreen>
         </iframe>
     `;
+    isVideoLoaded = true;
     
     // 清空输入框
     youtubeUrlInput.value = '';
@@ -408,8 +377,7 @@ function loadVideo() {
     setTimeout(() => {
         videoContainer.style.transform = 'scale(1)';
         
-        // 🎯 视频加载完成，全局键盘拦截已生效
-        console.log('🎯 视频已加载，评分键盘功能已激活');
+        console.log('视频已加载，评分键盘功能已激活');
     }, 200);
 }
 
@@ -426,8 +394,6 @@ function extractVideoId(url) {
     
     return (match && match[2].length === 11) ? match[2] : null;
 }
-
-// 🎯 全局键盘事件拦截已完美解决所有冲突问题
 
 // 显示当前分数统计（可选功能）
 function getTotalScore() {

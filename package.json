@@ -1,0 +1,15 @@
+{
+  "name": "yoyoclicker",
+  "version": "1.0.0",
+  "description": "一个专为悠悠球比赛设计的实时在线评分系统，集成YouTube视频播放和键盘快速评分功能。",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}
