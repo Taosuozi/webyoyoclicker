@@ -14,7 +14,7 @@ const scoreDisplayOverlay = document.getElementById('score-display');
 const videoStage = document.querySelector('.video-stage');
 const addScorePanel = document.querySelector('.add-score');
 const subtractScorePanel = document.querySelector('.subtract-score');
-const scoringKeys = ['0', '1', '2', '3', '4', '5', 'r', 'R'];
+const scoringKeys = ['0', '1', '2', '3', '4', '5', '6', '7', 'r', 'R'];
 let scorePanelPosition = { x: 24, y: 24 };
 let activeScorePanelDrag = null;
 
@@ -94,8 +94,18 @@ function handleGlobalKeyDown(e) {
             break;
         case '5':
             addPoints(5);
-            flashBackground('purple');
+            flashBackground('magenta');
             showScoreOnVideo(5);
+            break;
+        case '6':
+            addPoints(6);
+            flashBackground('sky');
+            showScoreOnVideo(6);
+            break;
+        case '7':
+            addPoints(7);
+            flashBackground('rainbow');
+            showScoreOnVideo(7);
             break;
         case '0':
             subtractPoints(1);
@@ -307,7 +317,7 @@ function flashBackground(color) {
     }
     
     // 移除所有现有的flash类
-    body.classList.remove('flash-green', 'flash-blue', 'flash-orange', 'flash-purple', 'flash-red');
+    body.classList.remove('flash-green', 'flash-blue', 'flash-orange', 'flash-purple', 'flash-magenta', 'flash-sky', 'flash-rainbow', 'flash-red');
     
     // 添加新的flash类
     body.classList.add(`flash-${color}`);
@@ -530,6 +540,14 @@ function showScoreOnVideo(score) {
             displayText = '+5';
             scoreClass = 'score-5';
             break;
+        case 6:
+            displayText = '+6';
+            scoreClass = 'score-6';
+            break;
+        case 7:
+            displayText = '+7';
+            scoreClass = 'score-7';
+            break;
         case -1:
             displayText = '-1';
             scoreClass = 'score-minus-1';
@@ -592,7 +610,9 @@ console.log(`
 2: +2分 (蓝色背景闪烁300ms + 视频左上角显示蓝色+2持续300ms)  
 3: +3分 (橙色背景闪烁300ms + 视频左上角显示橙色+3持续300ms)
 4: +4分 (紫色背景闪烁300ms + 视频左上角显示紫色+4持续300ms)
-5: +5分 (紫色背景闪烁300ms + 视频左上角显示紫色+5持续300ms)
+5: +5分 (洋红色背景闪烁300ms + 视频左上角显示洋红色+5持续300ms)
+6: +6分 (天蓝色背景闪烁300ms + 视频左上角显示天蓝色+6持续300ms)
+7: +7分 (彩色背景闪烁300ms + 视频左上角显示彩色+7持续300ms)
 0: -1分 (红色背景闪烁300ms + 视频左上角显示红色-1持续300ms)
 R: 重置分数 (保持视频加载状态)
 
@@ -604,12 +624,12 @@ F: 全屏
 
 🏆 完整功能列表：
 ✅ 全局事件拦截技术 - 彻底解决焦点冲突！
-✅ 数字键0-5被完全拦截用于评分
+✅ 数字键0-7被完全拦截用于评分
 ✅ 其他键100%传递给YouTube，功能完全正常
 ✅ 无论点击哪里，两套快捷键都能同时工作
 🆕 视频覆盖显示 - 评分数字直接显示在视频左上角！
-✅ 颜色对应：绿(+1)、蓝(+2)、橙(+3)、紫(+4/+5)、红(-1)
-✅ 字体递增：+1/-1基础大小，+2到+5依次增大
+✅ 颜色对应：绿(+1)、蓝(+2)、橙(+3)、紫(+4)、洋红(+5)、天蓝(+6)、彩色(+7)、红(-1)
+✅ 字体递增：+1/-1基础大小，+2到+7依次增大
 ✅ 动画效果：立即显示，300ms后淡出消失
 ✅ 纯文字显示：无边框无背景色，仅文字和阴影
 🔧 显示时间300ms：快速简洁的评分反馈

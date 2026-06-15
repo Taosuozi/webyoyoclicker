@@ -13,16 +13,28 @@
     'use strict';
 
     const positionStorageKey = 'yoyoclicker-bilibili-overlay-position';
-    const scoringKeys = ['0', '1', '2', '3', '4', '5', 'r', 'R'];
+    const scoringKeys = ['0', '1', '2', '3', '4', '5', '6', '7', 'r', 'R'];
     const defaultPanelPosition = { x: 24, y: 24 };
     const scoreColors = {
         '+1': '#4CAF50',
         '+2': '#2196F3',
         '+3': '#FF9800',
         '+4': '#9C27B0',
-        '+5': '#9C27B0',
+        '+5': '#E91E63',
+        '+6': '#00BFFF',
+        '+7': 'linear-gradient(90deg, #F44336, #FF9800, #FFEB3B, #4CAF50, #2196F3, #9C27B0)',
         '-1': '#F44336',
         reset: '#555555'
+    };
+    const scoreFontSizes = {
+        '+1': 42,
+        '+2': 46,
+        '+3': 50,
+        '+4': 54,
+        '+5': 58,
+        '+6': 62,
+        '+7': 66,
+        '-1': 42
     };
 
     let addScore = 0;
@@ -225,6 +237,12 @@
             case '5':
                 addPoints(5);
                 break;
+            case '6':
+                addPoints(6);
+                break;
+            case '7':
+                addPoints(7);
+                break;
             case '0':
                 subtractPoints(1);
                 break;
@@ -277,7 +295,8 @@
         const left = playerRect ? playerRect.left + 150 : 150;
 
         scorePop.textContent = text;
-        scorePop.style.color = color;
+        applyScorePopColor(scorePop, color);
+        scorePop.style.fontSize = `${scoreFontSizes[text] || 42}px`;
         scorePop.style.left = `${left}px`;
         scorePop.style.top = `${top}px`;
         scorePop.classList.add('show');
@@ -291,14 +310,16 @@
     function flashPlayerBorder(color) {
         const rect = getPlayerRect();
         if (!rect) return;
+        const borderColor = getBorderColor(color);
 
         clearTimeout(borderFlashTimeout);
         borderFlash.style.left = `${rect.left + 6}px`;
         borderFlash.style.top = `${rect.top + 6}px`;
         borderFlash.style.width = `${Math.max(rect.width - 12, 0)}px`;
         borderFlash.style.height = `${Math.max(rect.height - 12, 0)}px`;
-        borderFlash.style.borderColor = color;
-        borderFlash.style.boxShadow = `inset 0 0 0 4px ${hexToRgba(color, 0.55)}, 0 0 34px ${hexToRgba(color, 0.9)}`;
+        borderFlash.style.borderColor = borderColor;
+        borderFlash.style.borderImage = color.startsWith('linear-gradient') ? `${color} 1` : 'none';
+        borderFlash.style.boxShadow = `inset 0 0 0 4px ${hexToRgba(borderColor, 0.55)}, 0 0 34px ${hexToRgba(borderColor, 0.9)}`;
         borderFlash.classList.add('show');
 
         borderFlashTimeout = setTimeout(() => {
@@ -440,6 +461,27 @@
 
     function savePanelPosition() {
         localStorage.setItem(positionStorageKey, JSON.stringify(panelPosition));
+    }
+
+    function applyScorePopColor(element, color) {
+        if (color.startsWith('linear-gradient')) {
+            element.style.color = 'transparent';
+            element.style.background = color;
+            element.style.webkitBackgroundClip = 'text';
+            element.style.backgroundClip = 'text';
+            element.style.webkitTextStroke = '2px #fff';
+            return;
+        }
+
+        element.style.color = color;
+        element.style.background = 'none';
+        element.style.webkitBackgroundClip = 'border-box';
+        element.style.backgroundClip = 'border-box';
+        element.style.webkitTextStroke = '0';
+    }
+
+    function getBorderColor(color) {
+        return color.startsWith('linear-gradient') ? '#FFEB3B' : color;
     }
 
     function hexToRgba(hex, alpha) {

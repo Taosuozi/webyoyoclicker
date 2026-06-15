@@ -30,6 +30,18 @@ body.flash-purple {
     background-color: #9C27B0;
 }
 
+body.flash-magenta {
+    background-color: #E91E63;
+}
+
+body.flash-sky {
+    background-color: #00BFFF;
+}
+
+body.flash-rainbow {
+    background: linear-gradient(90deg, #F44336, #FF9800, #FFEB3B, #4CAF50, #2196F3, #9C27B0);
+}
+
 body.flash-red {
     background-color: #F44336;
 }
@@ -190,8 +202,22 @@ header h1 {
 }
 
 .score-number.score-5 {
-    color: #9C27B0;
+    color: #E91E63;
     font-size: 4.2em;
+}
+
+.score-number.score-6 {
+    color: #00BFFF;
+    font-size: 4.5em;
+}
+
+.score-number.score-7 {
+    color: transparent;
+    background: linear-gradient(90deg, #F44336, #FF9800, #FFEB3B, #4CAF50, #2196F3, #9C27B0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-stroke: 2px #fff;
+    font-size: 4.8em;
 }
 
 /* 消失动画 */
@@ -444,6 +470,14 @@ header h1 {
     .score-number.score-5 {
         font-size: 3.2em;
     }
+
+    .score-number.score-6 {
+        font-size: 3.4em;
+    }
+
+    .score-number.score-7 {
+        font-size: 3.6em;
+    }
     
     .key-info {
         gap: 15px;
@@ -516,5 +550,13 @@ header h1 {
     
     .score-number.score-5 {
         font-size: 2.6em;
+    }
+
+    .score-number.score-6 {
+        font-size: 2.8em;
+    }
+
+    .score-number.score-7 {
+        font-size: 3.0em;
     }
 } 
