@@ -4,9 +4,9 @@ let subtractScore = 0;
 let isVideoLoaded = false;
 
 // DOM元素
-const youtubeUrlInput = document.getElementById('youtube-url');
+const videoUrlInput = document.getElementById('youtube-url');
 const loadVideoBtn = document.getElementById('load-video');
-const youtubePlayer = document.getElementById('youtube-player');
+const videoPlayer = document.getElementById('youtube-player');
 const addScoreDisplay = document.getElementById('add-score');
 const subtractScoreDisplay = document.getElementById('subtract-score');
 const resetScoresBtn = document.getElementById('reset-scores');
@@ -30,7 +30,7 @@ function setupEventListeners() {
     loadVideoBtn.addEventListener('click', loadVideo);
     
     // 回车键加载视频
-    youtubeUrlInput.addEventListener('keypress', function(e) {
+    videoUrlInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             loadVideo();
         }
@@ -277,9 +277,9 @@ function resetScores() {
         showVideoInputSection();
         
         // 清空视频播放器
-        youtubePlayer.innerHTML = `
+        videoPlayer.innerHTML = `
             <div class="placeholder">
-                <p>请输入YouTube链接加载视频</p>
+                <p>请输入 YouTube 或 Bilibili 链接加载视频</p>
             </div>
         `;
         
@@ -335,38 +335,35 @@ function removeBackgroundFlash() {
     removeBackgroundFlashImmediate();
 }
 
-// 加载YouTube视频
+// 加载视频
 function loadVideo() {
-    const url = youtubeUrlInput.value.trim();
+    const url = videoUrlInput.value.trim();
     
     if (!url) {
-        alert('请输入YouTube视频链接');
+        alert('请输入 YouTube 或 Bilibili 视频链接');
         return;
     }
     
-    const videoId = extractVideoId(url);
+    const videoInfo = parseVideoUrl(url);
     
-    if (!videoId) {
-        alert('无效的YouTube链接，请检查后重试');
+    if (!videoInfo) {
+        alert('无效的视频链接，请输入 YouTube 或 Bilibili 视频链接');
         return;
     }
     
-    // 创建YouTube嵌入iframe
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&rel=0&modestbranding=1`;
-    
-    youtubePlayer.innerHTML = `
+    videoPlayer.innerHTML = `
         <iframe 
-            src="${embedUrl}" 
-            title="YouTube video player" 
+            src="${videoInfo.embedUrl}" 
+            title="${videoInfo.title}" 
             frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allow="${videoInfo.allow}" 
             allowfullscreen>
         </iframe>
     `;
     isVideoLoaded = true;
     
     // 清空输入框
-    youtubeUrlInput.value = '';
+    videoUrlInput.value = '';
     
     // 隐藏输入区域（渐隐效果）
     hideVideoInputSection();
@@ -377,12 +374,28 @@ function loadVideo() {
     setTimeout(() => {
         videoContainer.style.transform = 'scale(1)';
         
-        console.log('视频已加载，评分键盘功能已激活');
+        console.log(`${videoInfo.platform} 视频已加载，评分键盘功能已激活`);
     }, 200);
 }
 
+function parseVideoUrl(url) {
+    const normalizedUrl = normalizeVideoInput(url);
+    return parseYoutubeUrl(normalizedUrl) || parseBilibiliUrl(normalizedUrl);
+}
+
+function normalizeVideoInput(input) {
+    const iframeSrcMatch = input.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+    const url = (iframeSrcMatch ? iframeSrcMatch[1] : input).replace(/&amp;/g, '&');
+
+    if (url.startsWith('//')) {
+        return `https:${url}`;
+    }
+
+    return url;
+}
+
 // 从YouTube链接中提取视频ID
-function extractVideoId(url) {
+function parseYoutubeUrl(url) {
     // 支持的YouTube URL格式：
     // https://www.youtube.com/watch?v=VIDEO_ID
     // https://youtu.be/VIDEO_ID
@@ -392,7 +405,77 @@ function extractVideoId(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     
-    return (match && match[2].length === 11) ? match[2] : null;
+    if (!match || match[2].length !== 11) {
+        return null;
+    }
+
+    const videoId = match[2];
+
+    return {
+        platform: 'YouTube',
+        title: 'YouTube video player',
+        embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1&rel=0&modestbranding=1`,
+        allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+    };
+}
+
+// 从Bilibili链接中提取视频ID
+function parseBilibiliUrl(url) {
+    // 支持的Bilibili URL格式：
+    // https://www.bilibili.com/video/BVxxxxxxxxxx
+    // https://m.bilibili.com/video/BVxxxxxxxxxx
+    // https://www.bilibili.com/video/av123456
+    // https://www.bilibili.com/video/BVxxxxxxxxxx?p=2
+
+    const bvidMatch = url.match(/(?:\/video\/|bvid=)?(BV[0-9A-Za-z]{10})/i);
+    const aidMatch = url.match(/(?:\/video\/av|[?&]aid=)(\d+)/i);
+    const cid = getPositiveUrlParam(url, 'cid');
+    const page = getPositiveUrlParam(url, 'p') || getPositiveUrlParam(url, 'page') || '1';
+    const playerParams = [
+        'isOutside=true',
+        `p=${page}`,
+        cid ? `cid=${cid}` : null,
+        'autoplay=0',
+        'as_wide=1',
+        'high_quality=1',
+        'quality=80',
+        'qn=80',
+        'danmaku=0'
+    ].filter(Boolean).join('&');
+
+    if (bvidMatch) {
+        const bvid = bvidMatch[1];
+        return {
+            platform: 'Bilibili',
+            title: 'Bilibili video player',
+            embedUrl: `https://player.bilibili.com/player.html?bvid=${encodeURIComponent(bvid)}&${playerParams}`,
+            allow: 'autoplay; fullscreen; picture-in-picture'
+        };
+    }
+
+    if (aidMatch) {
+        const aid = aidMatch[1];
+        return {
+            platform: 'Bilibili',
+            title: 'Bilibili video player',
+            embedUrl: `https://player.bilibili.com/player.html?aid=${encodeURIComponent(aid)}&${playerParams}`,
+            allow: 'autoplay; fullscreen; picture-in-picture'
+        };
+    }
+
+    return null;
+}
+
+function getPositiveUrlParam(rawUrl, paramName) {
+    try {
+        const normalizedUrl = /^[a-z][a-z0-9+.-]*:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+        const value = new URL(normalizedUrl).searchParams.get(paramName);
+        const number = Number(value);
+
+        return Number.isInteger(number) && number > 0 ? String(number) : null;
+    } catch (error) {
+        return null;
+    }
 }
 
 // 显示当前分数统计（可选功能）
@@ -404,7 +487,7 @@ function getTotalScore() {
 let scoreDisplayTimeout = null;
 let scoreHideTimeout = null;
 
-// 🎬 在YouTube视频上显示评分数字（无边框版本 - 300ms显示时间）
+// 🎬 在视频上显示评分数字（无边框版本 - 300ms显示时间）
 function showScoreOnVideo(score) {
     if (!scoreDisplayOverlay) {
         console.log('⚠️ 评分显示元素未找到');
@@ -513,7 +596,7 @@ console.log(`
 0: -1分 (红色背景闪烁300ms + 视频左上角显示红色-1持续300ms)
 R: 重置分数 (保持视频加载状态)
 
-🎬 YouTube控制：
+🎬 视频控制：
 ←→: 快进/后退
 空格: 暂停/播放
 ↑↓: 音量调节
